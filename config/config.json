@@ -1,0 +1,13 @@
+{
+  "development": {
+    "username": "admin",
+    "password": "4E9bhHDiDidkTdpr5wRCKExpjvHTEy5U",
+    "database": "store_online",
+    "host": "dpg-cjm7imgcfp5c73f7d2c0-a.frankfurt-postgres.render.com",
+    "dialect": "postgresql",
+    "dialectOptions": {
+      "ssl": true
+    },
+    "ssl": true
+  }
+}
