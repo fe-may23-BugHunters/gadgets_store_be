@@ -8,13 +8,16 @@ export async function getAllFromCategory(
   offset: number,
   sortBy: SortField,
   category: Category,
+  reverse: boolean,
 ) {
+  const order = reverse ? 'ASC' : 'DESC';
+
   return Product.findAndCountAll({
     where: {
       category,
     },
     order: [
-      sortBy,
+      [ sortBy, order ],
     ],
     limit,
     offset,
@@ -45,6 +48,16 @@ export async function getRandom(limit: number, offset: number) {
   });
 }
 
+export async function getHottest(limit: number, offset: number) {
+  return Product.findAll({
+    order: [
+      [ 'priceDiscount', 'DESC' ],
+    ],
+    limit,
+    offset,
+  });
+}
+
 export async function getVariant(
   color: string,
   capacity: string,
@@ -63,17 +76,25 @@ export async function getVariant(
 }
 
 export async function searchProductsByQuery(
-  query: string, limit: number, offset: number,
+  query: string,
+  limit: number,
+  offset: number,
+  sortBy: SortField,
+  category: Category,
+  reverse: boolean,
 ) {
+  const order = reverse ? 'ASC' : 'DESC';
+
   return Product.findAndCountAll({
     where: {
       [Sequelize.Op.or]: [
         { name: { [Sequelize.Op.iLike]: `%${query}%` } },
         Sequelize.where(Sequelize.cast(Sequelize.col('description'), 'text'), { [Sequelize.Op.iLike]: `%${query}%` }),
       ],
+      category,
     },
     order: [
-      ['name', 'ASC'],
+      [ sortBy, order ],
     ],
     limit,
     offset,
