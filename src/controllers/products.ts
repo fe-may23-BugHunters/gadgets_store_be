@@ -23,7 +23,7 @@ export async function getAll(
     const category = Object.keys(Category)
       .includes(req.query.category as Category)
       ? req.query.category as Category
-      : undefined;
+      : 'phones';
 
     const result = await ProductsService.getAllFromCategory(
       limit,

@@ -33,7 +33,6 @@ Favourites.belongsTo(Product, {
 });
 
 Favourites.removeAttribute('id');
-// Favourites.removeAttribute('id');
 
 Favourites.sync()
   .then(() => {
