@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-shadow */
 import * as ProductsService from '../services/products';
 import { Request, Response } from 'express';
@@ -37,8 +38,8 @@ export async function getAll(
     } else {
       return res.status(404).json({ error: 'Product not found' });
     }
-  } catch (error) {
-    return res.status(500).json({ error: 'Internal Server error' });
+  } catch (error: any) {
+    return res.status(500).json(error.message);
   }
 }
 
