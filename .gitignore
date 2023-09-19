@@ -1,14 +1,14 @@
+.env
+
 # IDE
 .idea
 .vscode
 
 # Node
 node_modules
-package-lock.json
 
 # MacOS
 .DS_Store
 
 # Env
-
 build

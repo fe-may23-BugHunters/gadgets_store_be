@@ -9,10 +9,17 @@ export async function getAll(
   res: Response,
 ) {
   try {
-    const result = await OrdersService.getAll(req.params.userId);
+    const userId = req.params.userId;
+
+    if (!userId) {
+      return res.status(400)
+        .json({ error: 'Bad request' });
+    }
+
+    const result = await OrdersService.getAll(userId);
 
     if (!result) {
-      return res.status(404).json({ error: 'Order not found' });
+      return res.status(404).json({ error: 'Orders not found' });
     }
 
     return res.status(200).json(result);
@@ -26,12 +33,29 @@ export async function addOrder(
   res: Response,
 ) {
   try {
-    const result = await OrdersService.addOrder(
-      req.query.userId as string,
-      +(req.query.totalItems as string),
-      +(req.query.totalPrice as string),
-      req.query.products as string,
-    );
+    const {
+      userId,
+      totalItems,
+      totalPrice,
+      products,
+    } = req.body;
+
+    if (!userId
+      || !totalItems
+      || !totalPrice
+      || !Array.isArray(products)
+      || !products.length
+    ) {
+      return res.status(400)
+        .json({ error: 'Bad request' });
+    }
+
+    const result = await OrdersService.addOrder({
+      userId,
+      totalItems,
+      totalPrice,
+      products,
+    });
 
     if (result) {
       return res.status(201).json(result);
