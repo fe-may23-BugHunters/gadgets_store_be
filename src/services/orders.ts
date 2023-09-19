@@ -1,41 +1,56 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable no-console */
-/* eslint-disable max-len */
 import { Model } from 'sequelize-typescript';
-import { ShortHandProduct } from '../types/Product';
 import { Orders } from '../utils/db_order';
 import { OrderProducts } from '../utils/db_order_product';
 import { Product } from '../utils/db_product_table';
 import { addOrderProduct } from './orderProducts';
-import { NewOrder } from '../types/NewOrder';
+import { NewOrder, Order } from '../types/NewOrder';
 
 export function getAll(userId: string) {
-  return Orders.findAll({
+  const orders = Orders.findAll({
     where: { userId },
     include: [
-      { model: OrderProducts, as: 'details', include: [{ model: Product, as: 'product' }] },
+      {
+        model: OrderProducts,
+        as: 'details',
+        attributes: ['quantity'],
+        include: [
+          {
+            model: Product,
+            as: 'product',
+            attributes: [
+              'id',
+              'category',
+              'name',
+              'priceRegular',
+              'priceDiscount',
+            ],
+          },
+        ],
+      },
     ],
+    attributes: ['id', 'totalItems', 'totalPrice', 'createdAt'],
   });
+
+  return orders;
 }
 
-export async function addOrder(
-  userId :string,
-  totalItems: number,
-  totalPrice: number,
-  products: string,
-) {
+export async function addOrder({
+  userId,
+  totalItems,
+  totalPrice,
+  products,
+}: Order) {
   const newOrder = await Orders.create(
     { userId, totalItems, totalPrice },
   ) as unknown as Promise<Model<NewOrder>>;
 
   const items = [];
-  const validProducts: ShortHandProduct[] = JSON.parse(products);
 
-  for (let i = 0; i < validProducts.length; i++) {
+  for (let i = 0; i < products.length; i++) {
     const item = await addOrderProduct(
       (await newOrder)?.id,
-      validProducts[i].productId,
-      validProducts[i].quantity,
+      products[i].productId,
+      products[i].quantity.toString(),
     );
 
     items.push(item);
