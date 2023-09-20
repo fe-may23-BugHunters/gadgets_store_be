@@ -1,12 +1,38 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable max-len */
+/* eslint-disable object-curly-spacing */
 import { Model } from 'sequelize-typescript';
 import { Orders } from '../utils/db_order';
 import { OrderProducts } from '../utils/db_order_product';
 import { Product } from '../utils/db_product_table';
 import { addOrderProduct } from './orderProducts';
 import { NewOrder, Order } from '../types/NewOrder';
+import { Category } from '../types/Category';
 
-export function getAll(userId: string) {
-  const orders = Orders.findAll({
+export type PreparedProduct = {
+  id: string,
+  category: Category,
+  name: string,
+  priceRegular: number,
+  priceDiscount: number,
+}
+
+export type Details = {
+  quantity: number,
+  product: PreparedProduct,
+}
+
+export type PreparedOrder = {
+  id: string,
+  totalItems: number,
+  totalPrice: number,
+  createdAt: string,
+  details: Details,
+}
+
+export async function getAll(userId: string) {
+  const orders: any = await Orders.findAll({
     where: { userId },
     include: [
       {
@@ -29,9 +55,16 @@ export function getAll(userId: string) {
       },
     ],
     attributes: ['id', 'totalItems', 'totalPrice', 'createdAt'],
+    raw: true,
+    nest: true,
+    plain: false,
   });
 
-  return orders;
+  const preparedDetails = orders.map((order: PreparedOrder) => order.details);
+
+  const res = [{ ...orders[0], details: preparedDetails }];
+
+  return res;
 }
 
 export async function addOrder({
