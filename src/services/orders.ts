@@ -33,7 +33,7 @@ export type PreparedOrder = {
 
 export async function getAll(userId: string) {
   const orders: any = await Orders.findAll({
-    where: { userId: '1' },
+    where: { userId },
     include: [
       {
         model: OrderProducts,
@@ -68,13 +68,10 @@ export async function getAll(userId: string) {
 }
 
 export async function addOrder({
-  userId = '1',
-  totalItems = 2,
-  totalPrice = 78,
-  products = [
-    {productId: '599b9002-53da-11ee-95cd-fed709f87b70', quantity: 3},
-    {productId: '599ca5dc-53da-11ee-95cd-fed709f87b70', quantity: 1},
-  ],
+  userId,
+  totalItems,
+  totalPrice,
+  products,
 }: Order) {
   const newOrder = await Orders.create(
     { userId, totalItems, totalPrice },
