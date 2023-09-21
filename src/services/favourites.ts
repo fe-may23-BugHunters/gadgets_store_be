@@ -37,17 +37,7 @@ export async function deleteFavourite(userId :string, productId: string | undefi
       userId,
       productId,
     },
-  })
-    .then((rowsDeleted) => {
-      if (rowsDeleted === 1) {
-        console.log('Task deleted successfully.');
-      } else {
-        console.log('Task not found.');
-      }
-    })
-    .catch((error) => {
-      console.error('Error deleting task:', error);
-    });
+  });
 
   return result;
 }
