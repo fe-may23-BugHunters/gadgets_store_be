@@ -15,6 +15,7 @@ export async function getAll(
     const limit = req.query.limit && !isNaN(+req.query.limit)
       ? +req.query.limit
       : 10;
+    const reverse = req.query.reverse === 'true';
     const offset = req.query.offset && !isNaN(+req.query.offset)
       ? +req.query.offset
       : 0;
@@ -31,6 +32,7 @@ export async function getAll(
       offset,
       sortBy as SortField,
       category as Category,
+      reverse,
     );
 
     if (result) {
@@ -80,6 +82,26 @@ export async function getRandom10(
   }
 }
 
+export async function getHottest(
+  req: Request,
+  res: Response,
+) {
+  try {
+    const limit = 10;
+
+    const min = 1;
+    const max = (await ProductsService.getAll(1, 1)).count - limit;
+
+    const offset = Math.floor(Math.random() * (max - min)) + min;
+
+    const result = await ProductsService.getHottest(limit, offset);
+
+    return res.status(200).json(result);
+  } catch (error) {
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
+}
+
 export async function getByVariant(
   req: Request,
   res: Response,
@@ -115,6 +137,13 @@ export async function searchProducts(
     return res.status(400).json({ error: "'Query' is required" });
   }
 
+  const reverse = req.query.reverse === 'true';
+  const category = req.query.category
+    ? req.query.category
+    : 'phones';
+  const sortBy = req.query.sortBy
+    ? req.query.sortBy
+    : 'createdAt';
   const limit = req.query.limit && !isNaN(+req.query.limit)
     ? +req.query.limit
     : 10;
@@ -127,6 +156,9 @@ export async function searchProducts(
       query,
       limit,
       offset,
+      sortBy as SortField,
+      category as Category,
+      reverse,
     );
 
     if (results.rows.length === 0) {
