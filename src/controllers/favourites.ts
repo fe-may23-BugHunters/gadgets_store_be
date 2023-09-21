@@ -41,14 +41,17 @@ export async function deleteFavourite(
   req: Request,
   res: Response,
 ) {
-  try {
-    const result = await FavouritesService.deleteFavourite(req.params.userId, req.params.productId);
+  const userId = req.params.userId;
+  const productId = req.params.productId;
 
-    if (result !== undefined) {
-      return res.status(200).json(result);
-    } else {
-      return res.status(404).json({ error: 'Favourite not found' });
-    }
+  if (!userId || !productId) {
+    return res.status(400).json({ error: 'Bad request' });
+  }
+
+  try {
+    const result = await FavouritesService.deleteFavourite(userId, productId);
+
+    return res.sendStatus(204);
   } catch (error) {
     return res.status(500).json({ error: 'Internal Server Error' });
   }
